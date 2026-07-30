@@ -48,9 +48,10 @@ jobs:
             - name: My Custom Rule
               uses: ./.github/codeql/AllKnownCipherAlgorithm.ql
             
-            # 2. 精准、跨界点名调用系统自带的 LinesOfCode.ql
+            # 3. 🌟 完美纠正：统一格式。调用内置规则必须同样使用 uses！
+            # 语法格式为：包名:精确相对路径
             - name: System Lines of Code Metric
-              queries: Metrics/Summaries/LinesOfCode.ql
+              uses: codeql/java-queries:Metrics/Summaries/LinesOfCode.ql
           
 
     # 【关键改动】：对于编译型语言（如 Java/C#），官方默认会有一个 autobuild 步骤。
