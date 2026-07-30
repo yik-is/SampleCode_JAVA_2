@@ -29,7 +29,7 @@ jobs:
         languages: 'java'
         
         # 2. 设置build mode为none
-        #build-mode: none
+        build-mode: autobuild 
         
         
         # 通道 1️⃣：利用 with.queries 专门引入你通过 API 推送的本地自定义规则文件（支持相对路径）
