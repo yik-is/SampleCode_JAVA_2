@@ -26,10 +26,12 @@ jobs:
       uses: github/codeql-action/init@v4
       with:
         # 1. 指定你要扫描的语言（如: javascript, python, go, java, csharp, ruby）
-        #languages: 'java'
+        languages: 'java'
         
         # 2. 如果你想强制只跑你在第一问中提到的“自定义规则”，取消下面两行的注释，并指向你的规则路径
-        queries: ./.github/codeql/AllKnownCipherAlgorithm.ql
+        queries: |
+          ./.github/codeql/AllKnownCipherAlgorithm.ql
+          codeql/java-queries:Summary/LinesOfCode.ql
         
         # 3. 设置build mode为none
         #build-mode: none
