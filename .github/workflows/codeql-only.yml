@@ -33,20 +33,15 @@ jobs:
         
         
         # 通道 1️⃣：利用 with.queries 专门引入你通过 API 推送的本地自定义规则文件（支持相对路径）
-        queries: ./.github/codeql/AllKnownCipherAlgorithm.ql
+        # queries: ./.github/codeql/AllKnownCipherAlgorithm.ql
 
         # 通道 2️⃣：利用 with.packs 和 config 精准召回官方的标准度量规则
-        packs: 'codeql/java-queries'
+        packs: ./.github/codeql/
         
         config: |
           # 1. 冻结官方包里的那几百条默认安全审计规则，保持队列干净
           disable-default-queries: true
-          
-          # 2. 🌟 终极修正：在 config 的 queries 列表中，不写 uses，
-          #    直接通过内部查找模式定位官方包里的 LinesOfCode 度量文件
-          queries:
-            - name: System Lines of Code Metric
-              queries: Metrics/Summaries/LinesOfCode.ql
+
           
 
     # 【关键改动】：对于编译型语言（如 Java/C#），官方默认会有一个 autobuild 步骤。
