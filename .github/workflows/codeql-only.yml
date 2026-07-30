@@ -1,0 +1,80 @@
+name: "CodeQL Static Analysis Only"
+
+on:
+  #push:
+  #  branches: [ "main", "master" ]
+  #pull_request:
+  #  branches: [ "main", "master" ]
+  workflow_dispatch: # 支持在 GitHub 网页上点击按钮手动触发
+
+jobs:
+  analyze:
+    name: CodeQL Scan
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+    # 第一步：检出你的源代码
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 第二步：初始化 CodeQL 环境
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        # 1. 指定你要扫描的语言（如: javascript, python, go, java, csharp, ruby）
+        #languages: 'java'
+        
+        # 2. 如果你想强制只跑你在第一问中提到的“自定义规则”，取消下面两行的注释，并指向你的规则路径
+        queries: ./.github/codeql/AllKnownCipherAlgorithm.ql
+        
+        # 3. 设置build mode为none
+        #build-mode: none
+        
+        
+        # 4. 告诉 CodeQL 把扫描结果输出到当前目录下的 sarif-results 文件夹中
+        # output: sarif-results
+        
+        # 🌟 正确的做法 2：使用配置字符串（或指向配置文件）来剔除官方默认规则
+        # 通过显式将默认套件（default queries）设为 false，彻底关闭 java-queries
+        config: |
+          disable-default-queries: true
+
+    # 【关键改动】：对于编译型语言（如 Java/C#），官方默认会有一个 autobuild 步骤。
+    # 这里我们彻底删除了 - uses: github/codeql-action/autobuild@v3 这一行。
+    # 注意：如果是 Python/JS/Go 等解释型语言，不需要编译，直接进入下一步。
+
+    # 第三步：仅执行 CodeQL 扫描分析
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4
+      with:
+        # 1. 阻止 GitHub 自动把本地文件删掉
+        upload: false 
+        # 2. 强行把生成的 java.sarif 文件保存到你当前项目的根目录下
+        output: ${{ github.workspace }}/codeql/reports
+
+    - name: Auto Send SARIF Report
+      run: |
+        SARIF_PATH=$(ls ${{ github.workspace }}/codeql/reports/java.sarif | head -n 1) 
+        
+        if [ -f "$SARIF_PATH" ]; then
+          echo "=== 🕵️‍♂️ 正在执行权限与文件检查 ==="
+          # 2. 打印出文件的详细权限（如果是权限问题，这里会显示类似 -rw-r--r--）
+          ls -l "$SARIF_PATH"
+          
+          # 3. 强行把权限放大到最高（如果是没权限读取，这行命令会直接暴力破解）
+          sudo chmod 777 "$SARIF_PATH"
+          
+          echo "🚀 正在发送至指定服务器..."
+          curl -X POST \
+            -F "uploadFile=@$SARIF_PATH" \
+            http://220.231.250.211:53808/SelfRegistration/upload.jsp
+        else
+          echo "❌ 错误：在项目根目录未找到 java.sarif 文件！"
+          exit 1
+        fi
+
+    
