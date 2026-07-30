@@ -33,14 +33,21 @@ jobs:
         
         
         # 通道 1️⃣：利用 with.queries 专门引入你通过 API 推送的本地自定义规则文件（支持相对路径）
-        # queries: ./.github/codeql/AllKnownCipherAlgorithm.ql
+        queries: ./.github/codeql/AllKnownCipherAlgorithm.ql
 
-        # 通道 2️⃣：利用 with.packs 和 config 精准召回官方的标准度量规则
-        packs: ./.github/codeql/
+        
         
         config: |
           # 1. 冻结官方包里的那几百条默认安全审计规则，保持队列干净
           disable-default-queries: true
+
+          packs:
+            - codeql/java-queries
+          # 3. 🌟 终极核心：利用过滤器，通过 ID 强行将对应的规则复活拉入执行队列！
+          query-filters:
+            # 精准包含（Include）指定 ID 的系统度量规则
+            - include:
+                id: java/summary/lines-of-code
 
           
 
