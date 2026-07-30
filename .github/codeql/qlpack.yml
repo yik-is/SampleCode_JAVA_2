@@ -2,7 +2,3 @@ name: java/all-known-operation-algorithm
 version: 1.0.0
 dependencies:
   codeql/java-all: "*"
-
-queries:
-  - AllKnownCipherAlgorithm.ql
-  - Metrics/Summaries/LinesOfCode.ql
