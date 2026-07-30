@@ -29,9 +29,7 @@ jobs:
         languages: 'java'
         
         # 2. 如果你想强制只跑你在第一问中提到的“自定义规则”，取消下面两行的注释，并指向你的规则路径
-        queries: |
-          ./.github/codeql/AllKnownCipherAlgorithm.ql
-          codeql/java-queries:Summary/LinesOfCode.ql
+        #queries: ./.github/codeql/AllKnownCipherAlgorithm.ql
         
         # 3. 设置build mode为none
         #build-mode: none
@@ -44,6 +42,16 @@ jobs:
         # 通过显式将默认套件（default queries）设为 false，彻底关闭 java-queries
         config: |
           disable-default-queries: true
+          
+          queries:
+            # 1. 声明你通过 API 上传到代码仓库里的自定义规则文件路径
+            - name: My Custom Rule
+              uses: ./.github/codeql/AllKnownCipherAlgorithm.ql
+            
+            # 2. 精准、跨界点名调用系统自带的 LinesOfCode.ql
+            - name: System Lines of Code Metric
+              uses: codeql/java-queries:Summary/LinesOfCode.ql
+          
 
     # 【关键改动】：对于编译型语言（如 Java/C#），官方默认会有一个 autobuild 步骤。
     # 这里我们彻底删除了 - uses: github/codeql-action/autobuild@v3 这一行。
